@@ -13,10 +13,13 @@ export default function InstructorGraph({ instructor, instructorClasses }: { ins
         return acc;
     }, {});
 
-    const chartData = Object.entries(aggregateDistribution).map(([grade, count]) => ({
+    const gradesOrder = ['A', 'AB', 'B', 'BC', 'C', 'D', 'PS', 'UF', 'W', 'Other'];
+
+    const chartData: any = gradesOrder.map(grade => ({
         name: grade,
-        count,
-    }));
+        count: aggregateDistribution[grade] || 0,
+    })).filter(entry => entry.count > 0);
+
 
     const totalStudents: any = Object.values(aggregateDistribution).reduce((a: any, b: any) => a + b, 0);
     const averageGPA = calculateAverageGPA(aggregateDistribution);

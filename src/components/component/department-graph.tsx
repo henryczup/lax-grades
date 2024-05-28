@@ -17,10 +17,13 @@ export default function DepartmentGraph({ department, departmentGrades, departme
         return acc;
     }, {});
 
-    const chartData: any = Object.entries(aggregateDistribution).map(([grade, count]) => ({
+    const gradesOrder = ['A', 'AB', 'B', 'BC', 'C', 'D', 'PS', 'UF', 'W', 'Other'];
+
+    const chartData: any = gradesOrder.map(grade => ({
         name: grade,
-        count,
-    }));
+        count: aggregateDistribution[grade] || 0,
+    })).filter(entry => entry.count > 0);
+
 
     // Round the total students to the ones place
     const totalStudents = Object.values(aggregateDistribution).reduce((a: any, b: any) => a + b, 0);

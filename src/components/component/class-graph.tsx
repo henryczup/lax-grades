@@ -62,15 +62,19 @@ export default function ClassGraph({ classData, gpaDistributions }: { classData:
         Object.entries(aggregateDistribution).map(([grade, count]) => [grade, (count / totalStudents) * 100])
     );
 
+    const gradesOrder = ['A', 'AB', 'B', 'BC', 'C', 'D', 'PS', 'UF', 'W', 'Other'];
+
     // @ts-ignore
-    const chartData: {
+    let chartData: {
         // @ts-ignore
         grade: string;
         [key: string]: number;
-    }[] = Object.keys(percentageDistribution).map(grade => ({
-        grade,
-        Cumulative: percentageDistribution[grade],
-    }));
+    }[] = gradesOrder
+        .map(grade => ({
+            grade,
+            Cumulative: percentageDistribution[grade] || 0,
+        }))
+        .filter(entry => entry.Cumulative > 0);
 
     if (selectedInstructor !== null || selectedSemester !== null) {
         const filteredTotalStudents = Object.values(filteredDistributions.reduce((acc, dist) => {
@@ -91,13 +95,17 @@ export default function ClassGraph({ classData, gpaDistributions }: { classData:
             }, {} as { [key: string]: number })).map(([grade, count]) => [grade, (count / filteredTotalStudents) * 100])
         );
 
-        chartData.forEach(data => {
+        chartData = chartData.map(data => {
             const instructorName = selectedInstructor !== null ? instructors.find((instructor) => instructor.id === selectedInstructor)?.name : undefined;
             const key = instructorName || selectedSemester;
             if (key) {
-                data[key] = filteredPercentageDistribution[data.grade] || 0;
+                return {
+                    ...data,
+                    [key]: filteredPercentageDistribution[data.grade] || 0,
+                };
             }
-        });
+            return data;
+        }).filter(entry => Object.values(entry).some(value => typeof value === 'number' && value > 0));
     }
 
     return (

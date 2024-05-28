@@ -18,7 +18,8 @@ async function parseCSV(filePath: string) {
 }
 
 async function insertData(records: string[][]) {
-    for (const record of records) {
+    for (let i = 1; i < records.length; i++) {
+        const record = records[i];
         const [
             courseName,
             section,
@@ -39,7 +40,7 @@ async function insertData(records: string[][]) {
             percentOther,
         ] = record;
 
-        const cleanedDepartmentCode = departmentCode.replace('DEPT', '').trim();
+        const cleanedDepartmentCode = departmentCode.slice(0, -4).trim();
 
         // Find or create the department
         const department = await prisma.department.upsert({
@@ -100,10 +101,10 @@ async function insertData(records: string[][]) {
                     B: parseFloat(percentB),
                     BC: parseFloat(percentBC),
                     C: parseFloat(percentC),
-                    PS: parseFloat(percentPS),
                     D: parseFloat(percentD),
-                    UF: parseFloat(percentUF),
-                    W: parseFloat(percentW),
+                    Pass: parseFloat(percentPS),
+                    Fail: parseFloat(percentUF),
+                    Withdraw: parseFloat(percentW),
                     Other: parseFloat(percentOther),
                 },
             },
