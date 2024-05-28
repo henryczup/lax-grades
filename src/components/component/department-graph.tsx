@@ -21,9 +21,8 @@ export default function DepartmentGraph({ department, departmentGrades, departme
 
     const chartData: any = gradesOrder.map(grade => ({
         name: grade,
-        count: aggregateDistribution[grade] || 0,
+        count: parseFloat(aggregateDistribution[grade]?.toFixed(1) || '0'),
     })).filter(entry => entry.count > 0);
-
 
     // Round the total students to the ones place
     const totalStudents = Object.values(aggregateDistribution).reduce((a: any, b: any) => a + b, 0);
@@ -116,7 +115,7 @@ function BarChart({ data, ...props }: { data: any[], [key: string]: any }) {
                         },
                     },
                 }}
-                tooltipLabel={({ id }) => `${id}`}
+                tooltipLabel={({ indexValue }) => `${indexValue}`}
                 enableLabel={false}
                 role="application"
                 ariaLabel="A bar chart showing data"

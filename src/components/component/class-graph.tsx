@@ -72,7 +72,7 @@ export default function ClassGraph({ classData, gpaDistributions }: { classData:
     }[] = gradesOrder
         .map(grade => ({
             grade,
-            Cumulative: percentageDistribution[grade] || 0,
+            Cumulative: parseFloat(percentageDistribution[grade]?.toFixed(1) || '0'),
         }))
         .filter(entry => entry.Cumulative > 0);
 
@@ -257,7 +257,7 @@ function BarChart({ data, ...props }: BarChartProps) {
                         },
                     },
                 }}
-                tooltipLabel={({ id, value, indexValue }) => `${id} - ${indexValue}: ${value!.toFixed(2)}%`}
+                tooltipLabel={({ indexValue }) => `${indexValue}`}
                 enableLabel={false}
                 role="application"
                 ariaLabel="A bar chart showing grade distribution"

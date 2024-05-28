@@ -17,7 +17,7 @@ export default function InstructorGraph({ instructor, instructorClasses }: { ins
 
     const chartData: any = gradesOrder.map(grade => ({
         name: grade,
-        count: aggregateDistribution[grade] || 0,
+        count: parseFloat(aggregateDistribution[grade].toFixed(1) || '0'),
     })).filter(entry => entry.count > 0);
 
 
