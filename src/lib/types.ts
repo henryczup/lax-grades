@@ -36,7 +36,6 @@ export interface Department {
     name: string;
 }
 
-
-export interface Distribution {
+export interface GradePercentages {
     [key: string]: number;
 }

@@ -1,6 +1,5 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { Distribution } from "./types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -49,40 +48,7 @@ export const generatePagination = (currentPage: number, totalPages: number) => {
   ];
 };
 
-export function calculateAverageGPA(distribution: { [key: string]: number }) {
-  const totalEntries = Object.values(distribution).reduce((a, b) => a + b, 0);
-  const weightedSum = Object.entries(distribution).reduce((sum, [grade, count]) => {
-    const gradeValue = {
-      A: 4,
-      AB: 3.5,
-      B: 3,
-      BC: 2.5,
-      C: 2,
-      D: 1,
-      F: 0,
-    }[grade];
-    return sum + (gradeValue || 0) * count;
-  }, 0);
-  return totalEntries > 0 ? (weightedSum / totalEntries).toFixed(2) : "0.00";
-}
-
-export function calculatePercentageA(distribution: { [key: string]: number }) {
-  const totalEntries = Object.values(distribution).reduce((a, b) => a + b, 0);
-  const aCount = distribution["A"] || 0;
-  return totalEntries > 0 ? ((aCount / totalEntries) * 100).toFixed(2) : "0.00";
-}
-
 export const gradesOrder = ['A', 'AB', 'B', 'BC', 'C', 'D', 'F', 'Pass', 'Withdraw', 'Other'];
-
-export const getAggregateDistribution = (distributions: any[]): Distribution => {
-  return distributions.reduce((acc, dist) => {
-    const grades = dist.grades as Distribution;
-    Object.entries(grades).forEach(([grade, count]) => {
-      acc[grade] = (acc[grade] || 0) + count;
-    });
-    return acc;
-  }, {} as Distribution);
-};
 
 export const getUniqueSemesters = (distributions: any[]) => {
   return Array.from(new Set(distributions.map(dist => dist.term))).sort();

@@ -2,10 +2,11 @@
 import { useRouter } from "next/navigation";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../ui/select";
 import { useEffect, useState } from "react";
-import { getAggregateDistribution, getUniqueInstructors, getUniqueSemesters, gradesOrder } from "@/lib/utils";
+import { getUniqueInstructors, getUniqueSemesters, gradesOrder } from "@/lib/utils";
 import ClassBarChart from "./class-bar-chart";
 import Link from "next/link";
 import ClassDataCards from "./class-data-cards";
+import { GradePercentages } from "@/lib/types";
 
 export default function ClassFilterSelect({ classData, distributions }: { classData: any; distributions: any[] }) {
     const router = useRouter();
@@ -30,45 +31,35 @@ export default function ClassFilterSelect({ classData, distributions }: { classD
         return instructorMatch && semesterMatch;
     });
 
-    const aggregateDistribution = getAggregateDistribution(distributions);
-    const filteredDistribution = getAggregateDistribution(filteredDistributions);
+    const totalStudents = filteredDistributions.reduce((acc, curr) => acc + curr.studentHeadcount, 0);
+    const averageGPA = filteredDistributions.reduce((acc, curr) => acc + curr.avgCourseGrade * curr.studentHeadcount, 0) / totalStudents;
+    const gradePercentages: GradePercentages = gradesOrder.reduce((acc, grade) => {
+        const totalGradeStudents = filteredDistributions.reduce((sum, dist) => sum + (dist.grades[grade] / 100 * dist.studentHeadcount), 0);
+        acc[grade] = (totalGradeStudents / totalStudents) * 100;
+        return acc;
+    }, {} as GradePercentages);
 
-    const totalStudents = Object.values(aggregateDistribution).reduce((sum, count) => (sum as number) + (count as number), 0) as number;
-    const percentageDistribution = Object.fromEntries(
-        Object.entries(aggregateDistribution).map(([grade, count]) => [grade, ((count as number) / totalStudents) * 100])
-    );
+    const cumulativeGradePercentages: GradePercentages = gradesOrder.reduce((acc, grade) => {
+        const totalGradeStudents = distributions.reduce((sum, dist) => sum + (dist.grades[grade] / 100 * dist.studentHeadcount), 0);
+        acc[grade] = (totalGradeStudents / distributions.reduce((sum, dist) => sum + dist.studentHeadcount, 0)) * 100;
+        return acc;
+    }, {} as GradePercentages);
 
-    let chartData: {
-        grade: string;
-        Cumulative: number;
-        [key: string]: string | number;
-    }[] = gradesOrder
-        .map(grade => ({
+    let chartData = gradesOrder.map(grade => {
+        const data: any = {
             grade,
-            Cumulative: percentageDistribution[grade],
-        }))
-        .filter(entry => entry.Cumulative > 0);
+            cumulative: cumulativeGradePercentages[grade],
+        };
+        if (selectedInstructor) {
+            data.instructor = gradePercentages[grade];
+        } else if (selectedSemester) {
+            data.semester = gradePercentages[grade];
+        }
+        return data;
+    }).filter(entry => entry.cumulative > 0 || entry.instructor > 0 || entry.semester > 0);
 
-    if (selectedInstructor !== null || selectedSemester !== null) {
-        const filteredTotalStudents = Object.values(filteredDistribution).reduce((sum, count) => (sum as number) + (count as number), 0) as number;
+    const percentageA = gradePercentages["A"];
 
-        const filteredPercentageDistribution = Object.fromEntries(
-            Object.entries(filteredDistribution).map(([grade, count]) => [grade, ((count as number) / filteredTotalStudents) * 100])
-        );
-
-        chartData = chartData.map(data => {
-            const instructorName = selectedInstructor !== null ? instructors.find((instructor) => instructor.id === selectedInstructor)?.name : undefined;
-            const key = instructorName || selectedSemester;
-            if (key) {
-                return {
-                    ...data,
-                    Cumulative: data.Cumulative,
-                    [key]: filteredPercentageDistribution[data.grade] || 0,
-                };
-            }
-            return data;
-        }).filter(entry => Object.values(entry).some(value => typeof value === 'number' && value > 0));
-    }
 
     return (
         <>
@@ -130,9 +121,13 @@ export default function ClassFilterSelect({ classData, distributions }: { classD
                         </div>
                         {selectedSemester !== null && <span className="ml-2 text-gray-600">({selectedSemester})</span>}
                     </div>
-                    <ClassBarChart className="w-full h-[500px]" data={chartData} />
+                    <ClassBarChart className="w-full h-[500px]"
+                        data={chartData}
+                        selectedInstructor={selectedInstructor !== null ? instructors.find((instructor) => instructor.id === selectedInstructor)?.name || null : null}
+                        selectedSemester={selectedSemester}
+                    />
                 </div>
-                <ClassDataCards distribution={filteredDistribution} />
+                <ClassDataCards totalStudents={totalStudents} averageGPA={averageGPA} percentageA={percentageA} />
             </div>
         </>
     );

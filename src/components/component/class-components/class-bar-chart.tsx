@@ -1,18 +1,24 @@
 "use client";
-import { ResponsiveBar } from "@nivo/bar";
+import { BarDatum, ResponsiveBar } from "@nivo/bar";
 
-interface BarChartProps {
-    data: {
-        grade: string;
-        Cumulative: number;
-        [key: string]: string | number;
-    }[];
+interface ClassBarChartProps {
+    data: BarDatum[];
     [key: string]: any;
+    selectedInstructor: null | string;
+    selectedSemester: null | string;
 }
 
-export default function ClassBarChart({ data, ...props }: BarChartProps) {
-    const keys = Object.keys(data[0]).filter(key => key !== 'grade');
-    const colors = ['#840024', '#78797a', '#000000'];
+export default function ClassBarChart({ data, selectedInstructor, selectedSemester, ...props }: ClassBarChartProps) {
+    let keys: string[] = [];
+    let colors: string[] = [];
+
+    if (selectedInstructor || selectedSemester) {
+        keys = ['cumulative', selectedInstructor ? 'instructor' : 'semester'];
+        colors = ['#840024', '#78797a'];
+    } else {
+        keys = ['cumulative'];
+        colors = ['#840024'];
+    }
 
     return (
         <div {...props}>
@@ -55,10 +61,12 @@ export default function ClassBarChart({ data, ...props }: BarChartProps) {
                 tooltip={({ id, value, color }) => (
                     <div className="p-3 text-black bg-[#f6f6ef] rounded-md capitalize" >
                         <strong>
-                            {id === 'Cumulative' ? 'Cumulative' : id}
+                            {id === 'cumulative' ? 'Cumulative' : (
+                                selectedInstructor ? selectedInstructor : selectedSemester
+                            )}
                         </strong>
                         <br />
-                        {id === 'Cumulative' ? `${value.toFixed(1)}%` : `${value.toFixed(1)}%`}
+                        {`${value.toFixed(1)}%`}
                     </div>
                 )}
                 enableLabel={false}

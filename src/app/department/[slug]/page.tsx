@@ -3,7 +3,7 @@ import DepartmentDataCards from "@/components/component/department-components/de
 import DepartmentHoverCards from "@/components/component/department-components/department-hover-cards";
 import Search from "@/components/component/search-components/search";
 import { getDepartmentByCode, fetchDepartmentClasses, fetchDepartmentInstructors, fetchDepartmentGrades } from "@/lib/data";
-import { calculateAverageGPA, calculatePercentageA, gradesOrder } from "@/lib/utils";
+import { gradesOrder } from "@/lib/utils";
 
 export default async function DepartmentPage({ params }: { params: { slug: string } }) {
     const departmentCode = params.slug;

@@ -35,6 +35,8 @@ export async function fetchGPADistributions(
                 },
                 instructor: true,
                 term: true,
+                studentHeadcount: true,
+                avgCourseGrade: true,
                 grades: true,
             },
             orderBy: {
@@ -54,7 +56,6 @@ export async function fetchGPADistributions(
         throw new Error('Failed to fetch GPA distributions.');
     }
 }
-
 
 export const getSearch = async (search: string, classPage: number, instructorPage: number, departmentPage: number, limit: number) => {
     const classSkip = (classPage - 1) * limit;
