@@ -56,8 +56,10 @@ export async function fetchGPADistributions(
 }
 
 
-export const getSearch = async (search: string, page: number, limit: number) => {
-    const skip = (page - 1) * limit;
+export const getSearch = async (search: string, classPage: number, instructorPage: number, departmentPage: number, limit: number) => {
+    const classSkip = (classPage - 1) * limit;
+    const instructorSkip = (instructorPage - 1) * limit;
+    const departmentSkip = (departmentPage - 1) * limit;
 
     try {
         const [classResults, instructorResults, departmentResults, classCount, instructorCount, departmentCount] = await Promise.all([
@@ -92,7 +94,7 @@ export const getSearch = async (search: string, page: number, limit: number) => 
                 orderBy: {
                     code: 'asc',
                 },
-                skip,
+                skip: classSkip,
                 take: limit,
             }),
             prisma.instructor.findMany({
@@ -109,7 +111,7 @@ export const getSearch = async (search: string, page: number, limit: number) => 
                 orderBy: {
                     name: 'asc',
                 },
-                skip,
+                skip: instructorSkip,
                 take: limit,
             }),
             prisma.department.findMany({
@@ -137,12 +139,53 @@ export const getSearch = async (search: string, page: number, limit: number) => 
                 orderBy: {
                     code: 'asc',
                 },
-                skip,
+                skip: departmentSkip,
                 take: limit,
             }),
-            prisma.class.count(),
-            prisma.instructor.count(),
-            prisma.department.count(),
+            prisma.class.count({
+                where: search ? {
+                    OR: [
+                        {
+                            code: {
+                                contains: search,
+                                mode: 'insensitive',
+                            },
+                        },
+                        {
+                            name: {
+                                contains: search,
+                                mode: 'insensitive',
+                            },
+                        },
+                    ],
+                } : undefined,
+            }),
+            prisma.instructor.count({
+                where: search ? {
+                    name: {
+                        contains: search,
+                        mode: 'insensitive',
+                    },
+                } : undefined,
+            }),
+            prisma.department.count({
+                where: search ? {
+                    OR: [
+                        {
+                            code: {
+                                contains: search,
+                                mode: 'insensitive',
+                            },
+                        },
+                        {
+                            name: {
+                                contains: search,
+                                mode: 'insensitive',
+                            },
+                        },
+                    ],
+                } : undefined,
+            }),
         ]);
 
         return {

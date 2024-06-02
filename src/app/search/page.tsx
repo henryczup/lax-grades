@@ -14,13 +14,22 @@ export default async function Page({
     };
 }) {
     const query = searchParams?.query || "";
-    const currentPage = Number(searchParams?.page) || 1;
+    const page = Number(searchParams?.page) || 1;
     const limit = 10;
 
-    const { classes, instructors, departments, classCount, instructorCount, departmentCount } = await getSearch(query, currentPage, limit);
-    const totalClassesPages = Math.ceil(classCount / limit);
-    const totalInstructorsPages = Math.ceil(instructorCount / limit);
-    const totalDepartmentsPages = Math.ceil(departmentCount / limit);
+    const { classes, instructors, departments, classCount, instructorCount, departmentCount } = await getSearch(
+        query,
+        page,
+        page,
+        page,
+        limit
+    );
+
+    const totalPages = {
+        classes: Math.ceil(classCount / limit),
+        instructors: Math.ceil(instructorCount / limit),
+        departments: Math.ceil(departmentCount / limit),
+    };
 
     return (
         <div className="flex flex-col items-center justify-start p-8 gap-8 bg-white min-h-[85vh]">
@@ -34,36 +43,36 @@ export default async function Page({
                     <TabsTrigger value="Department">Department</TabsTrigger>
                 </TabsList>
                 <TabsContent value="Class">
-                    <Suspense key={query + currentPage} fallback={<Skeleton />}>
+                    <Suspense fallback={<Skeleton />}>
                         <SearchList
                             results={classes}
-                            currentPage={currentPage}
-                            totalPages={totalClassesPages}
+                            currentPage={page}
+                            totalPages={totalPages.classes}
                             entity="classes"
                         />
                     </Suspense>
                 </TabsContent>
                 <TabsContent value="Instructor">
-                    <Suspense key={query + currentPage} fallback={<Skeleton />}>
+                    <Suspense fallback={<Skeleton />}>
                         <SearchList
                             results={instructors}
-                            currentPage={currentPage}
-                            totalPages={totalInstructorsPages}
+                            currentPage={page}
+                            totalPages={totalPages.instructors}
                             entity="instructors"
                         />
                     </Suspense>
                 </TabsContent>
                 <TabsContent value="Department">
-                    <Suspense key={query + currentPage} fallback={<Skeleton />}>
+                    <Suspense fallback={<Skeleton />}>
                         <SearchList
                             results={departments}
-                            currentPage={currentPage}
-                            totalPages={totalDepartmentsPages}
+                            currentPage={page}
+                            totalPages={totalPages.departments}
                             entity="departments"
                         />
                     </Suspense>
                 </TabsContent>
             </Tabs>
-        </div >
+        </div>
     );
 }
