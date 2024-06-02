@@ -1,9 +1,9 @@
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import SearchList from "@/components/component/search-list";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import Search from "@/components/component/search";
+import Search from "@/components/component/search-components/search";
 import { getSearch } from "@/lib/data";
+import SearchList from "@/components/component/search-components/search-list";
 
 export default async function Page({
     searchParams,

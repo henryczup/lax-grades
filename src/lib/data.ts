@@ -1,5 +1,4 @@
 import { PrismaClient } from '@prisma/client';
-import { unstable_noStore as noStore } from 'next/cache';
 
 const prisma = new PrismaClient();
 
@@ -8,9 +7,9 @@ export async function fetchGPADistributions(
     instructorId: number | undefined,
     departmentId: number,
     startSemester: string | undefined,
-    endSemester: string | undefined
+    endSemester: string | undefined,
 ) {
-    noStore();
+
     try {
         const data = await prisma.distribution.findMany({
             where: {
@@ -196,7 +195,6 @@ export async function getInstructorById(instructorId: number) {
 }
 
 export async function fetchInstructorClasses(instructorId: number) {
-    noStore();
     try {
         const instructorClasses = await prisma.distribution.findMany({
             where: {

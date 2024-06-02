@@ -1,4 +1,4 @@
-import Search from "@/components/component/search"
+import Search from "@/components/component/search-components/search"
 import { BackgroundGradientAnimation } from "@/components/ui/background-animations"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Suspense } from "react"

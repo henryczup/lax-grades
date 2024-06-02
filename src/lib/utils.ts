@@ -70,3 +70,5 @@ export function calculatePercentageA(distribution: { [key: string]: number }) {
   const aCount = distribution["A"] || 0;
   return totalEntries > 0 ? ((aCount / totalEntries) * 100).toFixed(2) : "0.00";
 }
+
+export const gradesOrder = ['A', 'AB', 'B', 'BC', 'C', 'D', 'F', 'Pass', 'Withdraw', 'Other'];
