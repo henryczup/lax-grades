@@ -1,11 +1,25 @@
 "use client";
 import { ResponsiveBar } from "@nivo/bar";
 
-export default function DepartmentBarChart({ data, ...props }: { data: any[], [key: string]: any }) {
+interface BarChartProps {
+    data: {
+        name: string;
+        count: number;
+    }[];
+    [key: string]: any;
+}
+
+export default function DepartmentBarChart({ data, ...props }: BarChartProps) {
+    const totalCount = data.reduce((sum, item) => sum + item.count, 0);
+    const percentageData = data.map(item => ({
+        ...item,
+        count: (item.count / totalCount) * 100,
+    }));
+
     return (
         <div {...props}>
             <ResponsiveBar
-                data={data}
+                data={percentageData}
                 keys={["count"]}
                 indexBy="name"
                 margin={{ top: 0, right: 0, bottom: 40, left: 40 }}
@@ -19,6 +33,7 @@ export default function DepartmentBarChart({ data, ...props }: { data: any[], [k
                     tickSize: 0,
                     tickValues: 4,
                     tickPadding: 16,
+                    format: value => `${value}%`,
                 }}
                 gridYValues={4}
                 theme={{
@@ -38,7 +53,11 @@ export default function DepartmentBarChart({ data, ...props }: { data: any[], [k
                         },
                     },
                 }}
-                tooltipLabel={({ indexValue }) => `${indexValue}`}
+                tooltip={({ id, value, color }) => (
+                    <div className="p-3 text-black bg-[#f6f6ef] rounded-md capitalize">
+                        {value.toFixed(1)}%
+                    </div>
+                )}
                 enableLabel={false}
                 role="application"
                 ariaLabel="A bar chart showing department grade distributions"

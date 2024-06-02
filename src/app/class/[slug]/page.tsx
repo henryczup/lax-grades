@@ -20,12 +20,10 @@ export default async function ClassPage({ params, searchParams }: {
 
   const originalDistributions = await fetchGPADistributions(
     classData.id,
-    instructor ? parseInt(instructor) : undefined,
     classData.department.id,
     semester,
     semester
   );
-
 
   return (
     <>

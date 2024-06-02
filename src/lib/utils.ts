@@ -1,5 +1,6 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { Distribution } from "./types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -62,7 +63,7 @@ export function calculateAverageGPA(distribution: { [key: string]: number }) {
     }[grade];
     return sum + (gradeValue || 0) * count;
   }, 0);
-  return totalEntries > 0 ? (weightedSum / totalEntries).toFixed(3) : "0.000";
+  return totalEntries > 0 ? (weightedSum / totalEntries).toFixed(2) : "0.00";
 }
 
 export function calculatePercentageA(distribution: { [key: string]: number }) {
@@ -72,3 +73,65 @@ export function calculatePercentageA(distribution: { [key: string]: number }) {
 }
 
 export const gradesOrder = ['A', 'AB', 'B', 'BC', 'C', 'D', 'F', 'Pass', 'Withdraw', 'Other'];
+
+export const getAggregateDistribution = (distributions: any[]): Distribution => {
+  return distributions.reduce((acc, dist) => {
+    const grades = dist.grades as Distribution;
+    Object.entries(grades).forEach(([grade, count]) => {
+      acc[grade] = (acc[grade] || 0) + count;
+    });
+    return acc;
+  }, {} as Distribution);
+};
+
+export const getUniqueSemesters = (distributions: any[]) => {
+  return Array.from(new Set(distributions.map(dist => dist.term))).sort();
+};
+
+export const getUniqueInstructors = (distributions: any[]) => {
+  const uniqueInstructorIds = new Set<number>();
+  return distributions
+    .map((dist) => dist.instructor)
+    .filter((instructor): instructor is NonNullable<typeof instructor> => {
+      if (instructor !== null && instructor !== undefined) {
+        if (!uniqueInstructorIds.has(instructor.id)) {
+          uniqueInstructorIds.add(instructor.id);
+          return true;
+        }
+      }
+      return false;
+    })
+    .sort((a, b) => a.name.localeCompare(b.name));
+};
+
+
+export function calculateDepartmentStats(departmentGrades: { grade: string; count: number }[]) {
+  const aggregateDistribution = departmentGrades.reduce((acc: { [key: string]: number }, grade: { grade: string; count: number }) => {
+    acc[grade.grade] = (acc[grade.grade] || 0) + grade.count;
+    return acc;
+  }, {});
+
+  const totalStudents = Object.values(aggregateDistribution).reduce((a: any, b: any) => a + b, 0);
+  const averageGPA = calculateAverageGPA(aggregateDistribution);
+  const percentageA = calculatePercentageA(aggregateDistribution);
+
+  return { aggregateDistribution, totalStudents, averageGPA, percentageA };
+}
+
+
+export function calculateInstructorStats(instructorClasses: any[]) {
+  const aggregateDistribution = instructorClasses.reduce((acc: { [key: string]: number }, dist) => {
+    Object.entries(dist.grades).forEach(([grade, count]) => {
+      acc[grade] = (acc[grade] || 0) + (count as number);
+    });
+    return acc;
+  }, {});
+
+  const totalStudents = Object.values(aggregateDistribution).reduce((a, b) => a + b, 0);
+  const averageGPA = calculateAverageGPA(aggregateDistribution);
+  const percentageA = calculatePercentageA(aggregateDistribution);
+
+  return { aggregateDistribution, totalStudents, averageGPA, percentageA };
+}
+
+

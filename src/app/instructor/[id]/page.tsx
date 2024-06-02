@@ -3,28 +3,19 @@ import InstructorHoverCards from "@/components/component/instructor-components/i
 import InstructorDataCards from "@/components/component/instructor-components/intructor-data-cards";
 import Search from "@/components/component/search-components/search";
 import { getInstructorById, fetchInstructorClasses } from "@/lib/data";
-import { calculateAverageGPA, calculatePercentageA, gradesOrder } from "@/lib/utils";
+import { calculateInstructorStats, gradesOrder } from "@/lib/utils";
 
 export default async function InstructorPage({ params }: { params: { id: string } }) {
     const instructorId = parseInt(params.id);
     const instructor = await getInstructorById(instructorId);
     const instructorClasses = await fetchInstructorClasses(instructorId);
 
-    const aggregateDistribution = instructorClasses.reduce((acc: { [key: string]: number }, dist) => {
-        Object.entries(dist.grades).forEach(([grade, count]) => {
-            acc[grade] = (acc[grade] || 0) + count;
-        });
-        return acc;
-    }, {});
+    const { aggregateDistribution, totalStudents, averageGPA, percentageA } = calculateInstructorStats(instructorClasses);
 
     const chartData: any = gradesOrder.map(grade => ({
         name: grade,
-        count: parseFloat(aggregateDistribution[grade].toFixed(1) || '0'),
+        count: aggregateDistribution[grade],
     })).filter(entry => entry.count > 0);
-
-    const totalStudents: any = Object.values(aggregateDistribution).reduce((a: any, b: any) => a + b, 0);
-    const averageGPA = calculateAverageGPA(aggregateDistribution);
-    const percentageA = calculatePercentageA(aggregateDistribution);
 
     return (
         <div className="bg-white">

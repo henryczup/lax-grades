@@ -34,9 +34,7 @@ export interface Department {
     name: string;
 }
 
-export interface DepartmentGraphProps {
-    department: Department | null;
-    departmentGrades: Array<{ grade: string; count: number }>;
-    departmentClasses: Array<{ code: string; name: string }>;
-    departmentInstructors: Array<{ id: number; name: string; department: string }>;
+
+export interface Distribution {
+    [key: string]: number;
 }

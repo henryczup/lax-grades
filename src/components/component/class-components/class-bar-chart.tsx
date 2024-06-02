@@ -11,16 +11,19 @@ interface BarChartProps {
 }
 
 export default function ClassBarChart({ data, ...props }: BarChartProps) {
+    const keys = Object.keys(data[0]).filter(key => key !== 'grade');
+    const colors = ['#840024', '#78797a', '#000000'];
+
     return (
         <div {...props}>
             <ResponsiveBar
                 data={data}
-                keys={Object.keys(data[0]).filter(key => key !== 'grade')}
+                keys={keys}
                 indexBy="grade"
                 margin={{ top: 0, right: 0, bottom: 40, left: 40 }}
                 padding={0.2}
                 groupMode="grouped"
-                colors={['#840024', '#78797a']}
+                colors={colors}
                 axisBottom={{
                     tickSize: 0,
                     tickPadding: 16,
@@ -49,7 +52,15 @@ export default function ClassBarChart({ data, ...props }: BarChartProps) {
                         },
                     },
                 }}
-                tooltipLabel={({ indexValue }) => `${indexValue}`}
+                tooltip={({ id, value, color }) => (
+                    <div className="p-3 text-black bg-[#f6f6ef] rounded-md capitalize" >
+                        <strong>
+                            {id === 'Cumulative' ? 'Cumulative' : id}
+                        </strong>
+                        <br />
+                        {id === 'Cumulative' ? `${value.toFixed(1)}%` : `${value.toFixed(1)}%`}
+                    </div>
+                )}
                 enableLabel={false}
                 role="application"
                 ariaLabel="A bar chart showing class grade distributions"

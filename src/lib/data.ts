@@ -4,17 +4,14 @@ const prisma = new PrismaClient();
 
 export async function fetchGPADistributions(
     classId: number,
-    instructorId: number | undefined,
     departmentId: number,
     startSemester: string | undefined,
     endSemester: string | undefined,
 ) {
-
     try {
         const data = await prisma.distribution.findMany({
             where: {
                 classId,
-                instructorId: instructorId || undefined,
                 class: {
                     departmentId,
                 },

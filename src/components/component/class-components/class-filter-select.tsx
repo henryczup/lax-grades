@@ -2,12 +2,15 @@
 import { useRouter } from "next/navigation";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../ui/select";
 import { useEffect, useState } from "react";
-import { gradesOrder } from "@/lib/utils";
+import { getAggregateDistribution, getUniqueInstructors, getUniqueSemesters, gradesOrder } from "@/lib/utils";
 import ClassBarChart from "./class-bar-chart";
 import Link from "next/link";
 import ClassDataCards from "./class-data-cards";
 
-export default function ClassFilterSelect({ classData, originalDistributions }: { classData: any, originalDistributions: any[] }) {
+
+
+
+export default function ClassFilterSelect({ classData, originalDistributions }: { classData: any; originalDistributions: any[] }) {
     const router = useRouter();
     const [selectedInstructor, setSelectedInstructor] = useState<number | null>(null);
     const [selectedSemester, setSelectedSemester] = useState<string | null>(null);
@@ -20,21 +23,8 @@ export default function ClassFilterSelect({ classData, originalDistributions }: 
         router.push(url);
     }, [selectedInstructor, selectedSemester, classData.code, router]);
 
-    const uniqueInstructorIds = new Set<number>();
-    const instructors = originalDistributions
-        .map((dist) => dist.instructor)
-        .filter((instructor): instructor is NonNullable<typeof instructor> => {
-            if (instructor !== null && instructor !== undefined) {
-                if (!uniqueInstructorIds.has(instructor.id)) {
-                    uniqueInstructorIds.add(instructor.id);
-                    return true;
-                }
-            }
-            return false;
-        })
-        .sort((a, b) => a.name.localeCompare(b.name));
-
-    const semesters = Array.from(new Set(originalDistributions.map(dist => dist.term))).sort();
+    const instructors = getUniqueInstructors(originalDistributions);
+    const semesters = getUniqueSemesters(originalDistributions);
 
     const filteredDistributions = originalDistributions.filter((dist) => {
         const instructorMatch =
@@ -43,13 +33,8 @@ export default function ClassFilterSelect({ classData, originalDistributions }: 
         return instructorMatch && semesterMatch;
     });
 
-    const aggregateDistribution = originalDistributions.reduce((acc, dist) => {
-        const grades = dist.grades as { [key: string]: number };
-        Object.entries(grades).forEach(([grade, count]) => {
-            acc[grade] = (acc[grade] || 0) + count;
-        });
-        return acc;
-    }, {} as { [key: string]: number });
+    const aggregateDistribution = getAggregateDistribution(originalDistributions);
+    const filteredDistribution = getAggregateDistribution(filteredDistributions);
 
     const totalStudents = Object.values(aggregateDistribution).reduce((sum, count) => (sum as number) + (count as number), 0) as number;
     const percentageDistribution = Object.fromEntries(
@@ -59,31 +44,19 @@ export default function ClassFilterSelect({ classData, originalDistributions }: 
     let chartData: {
         grade: string;
         Cumulative: number;
+        [key: string]: string | number;
     }[] = gradesOrder
         .map(grade => ({
             grade,
-            Cumulative: parseFloat(percentageDistribution[grade]?.toFixed(1) || '0'),
+            Cumulative: percentageDistribution[grade],
         }))
         .filter(entry => entry.Cumulative > 0);
 
     if (selectedInstructor !== null || selectedSemester !== null) {
-
-        const filteredTotalStudents = Object.values(filteredDistributions.reduce((acc, dist) => {
-            const grades = dist.grades as { [key: string]: number };
-            Object.entries(grades).forEach(([grade, count]) => {
-                acc[grade] = (acc[grade] || 0) + (count as number);
-            });
-            return acc;
-        }, {} as { [key: string]: number })).reduce((sum, count) => (sum as number) + (count as number), 0) as number;
+        const filteredTotalStudents = Object.values(filteredDistribution).reduce((sum, count) => (sum as number) + (count as number), 0) as number;
 
         const filteredPercentageDistribution = Object.fromEntries(
-            Object.entries(filteredDistributions.reduce((acc, dist) => {
-                const grades = dist.grades as { [key: string]: number };
-                Object.entries(grades).forEach(([grade, count]) => {
-                    acc[grade] = (acc[grade] || 0) + (count as number);
-                });
-                return acc;
-            }, {} as { [key: string]: number })).map(([grade, count]) => [grade, ((count as number) / filteredTotalStudents) * 100])
+            Object.entries(filteredDistribution).map(([grade, count]) => [grade, ((count as number) / filteredTotalStudents) * 100])
         );
 
         chartData = chartData.map(data => {
@@ -92,6 +65,7 @@ export default function ClassFilterSelect({ classData, originalDistributions }: 
             if (key) {
                 return {
                     ...data,
+                    Cumulative: data.Cumulative,
                     [key]: filteredPercentageDistribution[data.grade] || 0,
                 };
             }
@@ -139,7 +113,7 @@ export default function ClassFilterSelect({ classData, originalDistributions }: 
                             {/** @ts-ignore */}
                             <SelectItem value={null}>All Semesters</SelectItem>
                             {semesters.map(semester => (
-                                <SelectItem key={semester} value={semester} >
+                                <SelectItem key={semester} value={semester}>
                                     {semester}
                                 </SelectItem>
                             ))}
@@ -161,8 +135,7 @@ export default function ClassFilterSelect({ classData, originalDistributions }: 
                     </div>
                     <ClassBarChart className="w-full h-[500px]" data={chartData} />
                 </div>
-                <ClassDataCards aggregateDistribution={aggregateDistribution} />
-
+                <ClassDataCards distribution={filteredDistribution} />
             </div>
         </>
     );
