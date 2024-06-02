@@ -103,35 +103,3 @@ export const getUniqueInstructors = (distributions: any[]) => {
     })
     .sort((a, b) => a.name.localeCompare(b.name));
 };
-
-
-export function calculateDepartmentStats(departmentGrades: { grade: string; count: number }[]) {
-  const aggregateDistribution = departmentGrades.reduce((acc: { [key: string]: number }, grade: { grade: string; count: number }) => {
-    acc[grade.grade] = (acc[grade.grade] || 0) + grade.count;
-    return acc;
-  }, {});
-
-  const totalStudents = Object.values(aggregateDistribution).reduce((a: any, b: any) => a + b, 0);
-  const averageGPA = calculateAverageGPA(aggregateDistribution);
-  const percentageA = calculatePercentageA(aggregateDistribution);
-
-  return { aggregateDistribution, totalStudents, averageGPA, percentageA };
-}
-
-
-export function calculateInstructorStats(instructorClasses: any[]) {
-  const aggregateDistribution = instructorClasses.reduce((acc: { [key: string]: number }, dist) => {
-    Object.entries(dist.grades).forEach(([grade, count]) => {
-      acc[grade] = (acc[grade] || 0) + (count as number);
-    });
-    return acc;
-  }, {});
-
-  const totalStudents = Object.values(aggregateDistribution).reduce((a, b) => a + b, 0);
-  const averageGPA = calculateAverageGPA(aggregateDistribution);
-  const percentageA = calculatePercentageA(aggregateDistribution);
-
-  return { aggregateDistribution, totalStudents, averageGPA, percentageA };
-}
-
-

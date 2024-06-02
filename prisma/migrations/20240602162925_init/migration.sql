@@ -32,6 +32,8 @@ CREATE TABLE "Distribution" (
     "classId" INTEGER NOT NULL,
     "instructorId" INTEGER,
     "term" TEXT NOT NULL,
+    "studentHeadcount" INTEGER NOT NULL,
+    "avgCourseGrade" DOUBLE PRECISION NOT NULL,
     "grades" JSONB NOT NULL,
 
     CONSTRAINT "Distribution_pkey" PRIMARY KEY ("id")

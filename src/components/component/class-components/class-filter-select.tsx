@@ -7,10 +7,7 @@ import ClassBarChart from "./class-bar-chart";
 import Link from "next/link";
 import ClassDataCards from "./class-data-cards";
 
-
-
-
-export default function ClassFilterSelect({ classData, originalDistributions }: { classData: any; originalDistributions: any[] }) {
+export default function ClassFilterSelect({ classData, distributions }: { classData: any; distributions: any[] }) {
     const router = useRouter();
     const [selectedInstructor, setSelectedInstructor] = useState<number | null>(null);
     const [selectedSemester, setSelectedSemester] = useState<string | null>(null);
@@ -23,17 +20,17 @@ export default function ClassFilterSelect({ classData, originalDistributions }: 
         router.push(url);
     }, [selectedInstructor, selectedSemester, classData.code, router]);
 
-    const instructors = getUniqueInstructors(originalDistributions);
-    const semesters = getUniqueSemesters(originalDistributions);
+    const instructors = getUniqueInstructors(distributions);
+    const semesters = getUniqueSemesters(distributions);
 
-    const filteredDistributions = originalDistributions.filter((dist) => {
+    const filteredDistributions = distributions.filter((dist) => {
         const instructorMatch =
             selectedInstructor === null || dist.instructor?.id === selectedInstructor;
         const semesterMatch = selectedSemester === null || dist.term === selectedSemester;
         return instructorMatch && semesterMatch;
     });
 
-    const aggregateDistribution = getAggregateDistribution(originalDistributions);
+    const aggregateDistribution = getAggregateDistribution(distributions);
     const filteredDistribution = getAggregateDistribution(filteredDistributions);
 
     const totalStudents = Object.values(aggregateDistribution).reduce((sum, count) => (sum as number) + (count as number), 0) as number;

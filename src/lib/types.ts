@@ -13,6 +13,8 @@ export interface ClassData {
 export interface GradeDistribution {
     term: string;
     grades: Prisma.JsonValue;
+    studentHeadcount: number;
+    avgCourseGrade: number;
     class: {
         code: string;
         name: string;

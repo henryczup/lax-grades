@@ -248,6 +248,8 @@ export async function fetchInstructorClasses(instructorId: number) {
                     },
                 },
                 term: true,
+                studentHeadcount: true,
+                avgCourseGrade: true,
                 grades: true,
             },
             orderBy: {
@@ -255,10 +257,9 @@ export async function fetchInstructorClasses(instructorId: number) {
             },
         });
 
-        // Parse the grades data as { [key: string]: number }
         const parsedData = instructorClasses.map((item) => ({
             ...item,
-            grades: item.grades as { [key: string]: number },
+            gradePercentages: item.grades as { [key: string]: number },
         }));
 
         return parsedData;
@@ -326,25 +327,24 @@ export async function fetchDepartmentGrades(departmentId: number) {
                 },
             },
             select: {
+                class: {
+                    select: {
+                        code: true,
+                        name: true,
+                    },
+                },
                 grades: true,
+                studentHeadcount: true,
+                avgCourseGrade: true,
             },
         });
 
-        const gradesMap: { [key: string]: number } = {};
-
-        departmentGrades.forEach((distribution) => {
-            const grades = distribution.grades as { [key: string]: number };
-            Object.entries(grades).forEach(([grade, count]) => {
-                gradesMap[grade] = (gradesMap[grade] || 0) + count;
-            });
-        });
-
-        const result = Object.entries(gradesMap).map(([grade, count]) => ({
-            grade,
-            count,
+        const parsedData = departmentGrades.map((item) => ({
+            ...item,
+            gradePercentages: item.grades as { [key: string]: number },
         }));
 
-        return result;
+        return parsedData;
     } catch (error) {
         console.error('Failed to fetch department grades:', error);
         throw new Error('Failed to fetch department grades');

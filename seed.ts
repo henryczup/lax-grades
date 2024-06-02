@@ -25,7 +25,7 @@ async function insertData(records: string[][]) {
             section,
             term,
             departmentCode,
-            instructorName,
+            instructorNames,
             studentHeadcount,
             avgCourseGrade,
             percentA,
@@ -76,41 +76,56 @@ async function insertData(records: string[][]) {
             },
         });
 
-        // Find or create the instructor
-        const instructor = await prisma.instructor.findFirst({
-            where: { name: instructorName },
-        });
-        if (!instructor) {
-            await prisma.instructor.create({
-                data: {
-                    name: instructorName,
-                    department: cleanedDepartmentCode,
-                },
-            });
-        }
+        // Split instructor names by semicolon and trim whitespace
+        const instructorNameArray = instructorNames.split(';').map((name) => name.trim());
 
-        // Create the distribution record
-        await prisma.distribution.create({
-            data: {
-                classId: classRecord.id,
-                instructorId: instructor?.id,
-                term,
-                grades: {
-                    A: parseFloat(percentA),
-                    AB: parseFloat(percentAB),
-                    B: parseFloat(percentB),
-                    BC: parseFloat(percentBC),
-                    C: parseFloat(percentC),
-                    D: parseFloat(percentD),
-                    F: parseFloat(percentUF),
-                    Pass: parseFloat(percentPS),
-                    Withdraw: parseFloat(percentW),
-                    Other: parseFloat(percentOther),
-                },
-            },
-        });
+        // Find or create the instructors
+        const instructors = await Promise.all(
+            instructorNameArray.map(async (instructorName) => {
+                const instructor = await prisma.instructor.findFirst({
+                    where: { name: instructorName },
+                });
+                if (!instructor) {
+                    return prisma.instructor.create({
+                        data: {
+                            name: instructorName,
+                            department: cleanedDepartmentCode,
+                        },
+                    });
+                }
+                return instructor;
+            })
+        );
+
+        // Create the distribution record for each instructor
+        await Promise.all(
+            instructors.map((instructor) =>
+                prisma.distribution.create({
+                    data: {
+                        classId: classRecord.id,
+                        instructorId: instructor.id,
+                        term,
+                        studentHeadcount: parseInt(studentHeadcount),
+                        avgCourseGrade: parseFloat(avgCourseGrade),
+                        grades: {
+                            A: parseFloat(percentA),
+                            AB: parseFloat(percentAB),
+                            B: parseFloat(percentB),
+                            BC: parseFloat(percentBC),
+                            C: parseFloat(percentC),
+                            D: parseFloat(percentD),
+                            F: parseFloat(percentUF),
+                            Pass: parseFloat(percentPS),
+                            Withdraw: parseFloat(percentW),
+                            Other: parseFloat(percentOther),
+                        },
+                    },
+                })
+            )
+        );
     }
 }
+
 
 async function main() {
     const csvFilePath = 'university_data.csv';

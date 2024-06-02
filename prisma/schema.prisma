@@ -38,11 +38,13 @@ model Department {
 }
 
 model Distribution {
-  id           Int         @id @default(autoincrement())
-  class        Class       @relation(fields: [classId], references: [id])
-  classId      Int
-  instructor   Instructor? @relation(fields: [instructorId], references: [id])
-  instructorId Int?
-  term         String
-  grades       Json
+  id               Int         @id @default(autoincrement())
+  class            Class       @relation(fields: [classId], references: [id])
+  classId          Int
+  instructor       Instructor? @relation(fields: [instructorId], references: [id])
+  instructorId     Int?
+  term             String
+  studentHeadcount Int
+  avgCourseGrade   Float
+  grades           Json
 }

@@ -3,19 +3,27 @@ import InstructorHoverCards from "@/components/component/instructor-components/i
 import InstructorDataCards from "@/components/component/instructor-components/intructor-data-cards";
 import Search from "@/components/component/search-components/search";
 import { getInstructorById, fetchInstructorClasses } from "@/lib/data";
-import { calculateInstructorStats, gradesOrder } from "@/lib/utils";
+import { gradesOrder } from "@/lib/utils";
 
 export default async function InstructorPage({ params }: { params: { id: string } }) {
     const instructorId = parseInt(params.id);
     const instructor = await getInstructorById(instructorId);
-    const instructorClasses = await fetchInstructorClasses(instructorId);
+    const instructorData = await fetchInstructorClasses(instructorId);
 
-    const { aggregateDistribution, totalStudents, averageGPA, percentageA } = calculateInstructorStats(instructorClasses);
+    const totalStudents = instructorData.reduce((acc, curr) => acc + curr.studentHeadcount, 0);
+    const averageGPA = instructorData.reduce((acc, curr) => acc + curr.avgCourseGrade * curr.studentHeadcount, 0) / totalStudents;
+    const gradePercentages: { [key: string]: number } = {};
+    gradesOrder.forEach(grade => {
+        const totalGradeStudents = instructorData.reduce((acc, curr) => acc + (curr.gradePercentages[grade] / 100 * curr.studentHeadcount), 0);
+        gradePercentages[grade] = (totalGradeStudents / totalStudents) * 100;
+    });
 
-    const chartData: any = gradesOrder.map(grade => ({
-        name: grade,
-        count: aggregateDistribution[grade],
-    })).filter(entry => entry.count > 0);
+    const chartData = gradesOrder.map(grade => ({
+        grade,
+        percentage: gradePercentages[grade],
+    })).filter(entry => entry.percentage > 0);
+
+    const percentageA = gradePercentages["A"];
 
     return (
         <div className="bg-white">
@@ -28,12 +36,14 @@ export default async function InstructorPage({ params }: { params: { id: string 
                 <div className="mt-6 flex flex-col gap-4">
                     <div className="col-span-2">
                         <h2 className="text-lg font-semibold text-gray-900 mb-4">Overall Grades Given</h2>
-                        <InstructorBarChart className="w-full h-[300px]" data={chartData} />
+                        <div className="w-full h-[300px]">
+                            <InstructorBarChart data={chartData} />
+                        </div>
                     </div>
                     <InstructorDataCards totalStudents={totalStudents} averageGPA={averageGPA} percentageA={percentageA} />
                 </div>
             </div>
-            <InstructorHoverCards instructorClasses={instructorClasses} />
+            <InstructorHoverCards instructorClasses={instructorData} />
         </div >
     );
 }

@@ -3,65 +3,58 @@ import { ResponsiveBar } from "@nivo/bar";
 
 interface BarChartProps {
     data: {
-        name: string;
-        count: number;
+        grade: string;
+        percentage: number;
     }[];
-    [key: string]: any;
 }
 
-export default function DepartmentBarChart({ data, ...props }: BarChartProps) {
-    const totalCount = data.reduce((sum, item) => sum + item.count, 0);
-    const percentageData = data.map(item => ({
-        ...item,
-        count: (item.count / totalCount) * 100,
-    }));
-
+export default function DepartmentBarChart({ data }: BarChartProps) {
     return (
-        <div {...props}>
-            <ResponsiveBar
-                data={percentageData}
-                keys={["count"]}
-                indexBy="name"
-                margin={{ top: 0, right: 0, bottom: 40, left: 40 }}
-                padding={0.3}
-                colors={["#840024"]}
-                axisBottom={{
-                    tickSize: 0,
-                    tickPadding: 16,
-                }}
-                axisLeft={{
-                    tickSize: 0,
-                    tickValues: 4,
-                    tickPadding: 16,
-                    format: value => `${value}%`,
-                }}
-                gridYValues={4}
-                theme={{
-                    tooltip: {
-                        chip: {
-                            borderRadius: "9999px",
-                        },
-                        container: {
-                            fontSize: "12px",
-                            textTransform: "capitalize",
-                            borderRadius: "6px",
-                        },
+        <ResponsiveBar
+            data={data}
+            keys={["percentage"]}
+            indexBy="grade"
+            margin={{ top: 0, right: 0, bottom: 40, left: 40 }}
+            padding={0.3}
+            colors={["#840024"]}
+            axisBottom={{
+                tickSize: 0,
+                tickPadding: 16,
+            }}
+            axisLeft={{
+                tickSize: 0,
+                tickValues: 4,
+                tickPadding: 16,
+                format: (value) => `${value}%`,
+            }}
+            gridYValues={4}
+            theme={{
+                tooltip: {
+                    chip: {
+                        borderRadius: "9999px",
                     },
-                    grid: {
-                        line: {
-                            stroke: "#f3f4f6",
-                        },
+                    container: {
+                        fontSize: "12px",
+                        textTransform: "capitalize",
+                        borderRadius: "6px",
                     },
-                }}
-                tooltip={({ id, value, color }) => (
-                    <div className="p-3 text-black bg-[#f6f6ef] rounded-md capitalize">
-                        {value.toFixed(1)}%
-                    </div>
-                )}
-                enableLabel={false}
-                role="application"
-                ariaLabel="A bar chart showing department grade distributions"
-            />
-        </div>
+                },
+                grid: {
+                    line: {
+                        stroke: "#f3f4f6",
+                    },
+                },
+            }}
+            tooltip={({ id, value }) => (
+                <div className="p-3 text-black bg-[#f6f6ef] rounded-md capitalize">
+                    <strong>{id}</strong>
+                    <br />
+                    {value.toFixed(1)}%
+                </div>
+            )}
+            enableLabel={false}
+            role="application"
+            ariaLabel="A bar chart showing department grade distributions"
+        />
     );
 }

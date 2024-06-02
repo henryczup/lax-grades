@@ -18,7 +18,7 @@ export default async function ClassPage({ params, searchParams }: {
     return <div className="bg-white h-screen flex flex-center justify-center text-h1">NO DATA</div>;
   }
 
-  const originalDistributions = await fetchGPADistributions(
+  const distributions = await fetchGPADistributions(
     classData.id,
     classData.department.id,
     semester,
@@ -39,7 +39,7 @@ export default async function ClassPage({ params, searchParams }: {
           </p>
         </div>
         <div className="lg:grid lg:grid-cols-4 gap-16 mt-4">
-          <ClassFilterSelect classData={classData} originalDistributions={originalDistributions} />
+          <ClassFilterSelect classData={classData} distributions={distributions} />
         </div>
       </div>
     </>
