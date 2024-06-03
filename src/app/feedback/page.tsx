@@ -12,7 +12,7 @@ export default function Component() {
             <Card className="justify-center items-center bg-[#f6f6ef]">
                 <CardHeader>
                     <CardTitle>Send us your feedback</CardTitle>
-                    <CardDescription>We'd love to hear your thoughts! Fill out the form below.</CardDescription>
+                    <CardDescription>We&apos;d love to hear your thoughts! Fill out the form below.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
