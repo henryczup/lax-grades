@@ -18,7 +18,7 @@ export default function ClassFilterSelect({ classData, distributions }: { classD
         if (selectedInstructor) params.set('instructor', selectedInstructor.toString());
         if (selectedSemester) params.set('semester', selectedSemester);
         const url = `/class/${classData.code}?${params.toString()}`;
-        router.push(url);
+        router.push(url, { scroll: false });
     }, [selectedInstructor, selectedSemester, classData.code, router]);
 
     const instructors = getUniqueInstructors(distributions);
