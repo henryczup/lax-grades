@@ -22,7 +22,9 @@ export default function ClassFilterSelect({ classData, distributions }: { classD
     }, [selectedInstructor, selectedSemester, classData.code, router]);
 
     const instructors = getUniqueInstructors(distributions);
-    const semesters = getUniqueSemesters(distributions);
+    const semesters = selectedInstructor
+        ? getUniqueSemesters(distributions.filter(dist => dist.instructor?.id === selectedInstructor))
+        : getUniqueSemesters(distributions);
 
     const filteredDistributions = distributions.filter((dist) => {
         const instructorMatch =

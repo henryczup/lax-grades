@@ -21,8 +21,6 @@ export default async function ClassPage({ params, searchParams }: {
   const distributions = await fetchGPADistributions(
     classData.id,
     classData.department.id,
-    semester,
-    semester
   );
 
   return (

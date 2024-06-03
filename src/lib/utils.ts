@@ -50,9 +50,24 @@ export const generatePagination = (currentPage: number, totalPages: number) => {
 
 export const gradesOrder = ['A', 'AB', 'B', 'BC', 'C', 'D', 'F', 'Pass', 'Withdraw', 'Other'];
 
-export const getUniqueSemesters = (distributions: any[]) => {
-  return Array.from(new Set(distributions.map(dist => dist.term))).sort();
-};
+export function getUniqueSemesters(distributions: any[]): string[] {
+  const semesters = Array.from(new Set(distributions.map((dist) => dist.term)));
+  return semesters.sort((a, b) => {
+    const [aSemester, aYear] = a.split(' ');
+    const [bSemester, bYear] = b.split(' ');
+
+    if (aYear !== bYear) {
+      return parseInt(bYear) - parseInt(aYear);
+    } else {
+      const semesterOrder: { [key: string]: number } = {
+        Spring: 1,
+        Summer: 2,
+        Fall: 3,
+      };
+      return semesterOrder[bSemester] - semesterOrder[aSemester];
+    }
+  });
+}
 
 export const getUniqueInstructors = (distributions: any[]) => {
   const uniqueInstructorIds = new Set<number>();
