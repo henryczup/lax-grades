@@ -25,9 +25,12 @@ export default function Footer() {
                     </li>
                 ))}
             </ul> */}
-            <Link href="https://github.com/henryczup/LaxGrades" target="_blank" rel="noopener noreferrer">
-                View in Github
-            </Link>
+            <div className="flex gap-x-3 sm:gap-x-8">
+                <Link href="/feedback">Leave Feedback</Link>
+                <Link href="https://github.com/henryczup/lax-grades" target="_blank" rel="noopener noreferrer">
+                    View in Github
+                </Link>
+            </div>
         </footer>
     );
 }
