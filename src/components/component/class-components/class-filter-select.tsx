@@ -31,17 +31,19 @@ export default function ClassFilterSelect({ classData, distributions }: { classD
         return instructorMatch && semesterMatch;
     });
 
-    const totalStudents = filteredDistributions.reduce((acc, curr) => acc + curr.studentHeadcount, 0);
-    const averageGPA = filteredDistributions.reduce((acc, curr) => acc + curr.avgCourseGrade * curr.studentHeadcount, 0) / totalStudents;
-    const gradePercentages: GradePercentages = gradesOrder.reduce((acc, grade) => {
+    const filteredNumStudents = filteredDistributions.reduce((acc, curr) => acc + curr.studentHeadcount, 0);
+    const filteredAverageGPA = filteredDistributions.reduce((acc, curr) => acc + curr.avgCourseGrade * curr.studentHeadcount, 0) / filteredNumStudents;
+    const filteredGradePercentages: GradePercentages = gradesOrder.reduce((acc, grade) => {
         const totalGradeStudents = filteredDistributions.reduce((sum, dist) => sum + (dist.grades[grade] / 100 * dist.studentHeadcount), 0);
-        acc[grade] = (totalGradeStudents / totalStudents) * 100;
+        acc[grade] = (totalGradeStudents / filteredNumStudents) * 100;
         return acc;
     }, {} as GradePercentages);
 
+    const cumulativeNumStudents = distributions.reduce((sum, dist) => sum + dist.studentHeadcount, 0)
+    const cumulativeAverageGPA = distributions.reduce((acc, curr) => acc + curr.avgCourseGrade * curr.studentHeadcount, 0) / cumulativeNumStudents;
     const cumulativeGradePercentages: GradePercentages = gradesOrder.reduce((acc, grade) => {
         const totalGradeStudents = distributions.reduce((sum, dist) => sum + (dist.grades[grade] / 100 * dist.studentHeadcount), 0);
-        acc[grade] = (totalGradeStudents / distributions.reduce((sum, dist) => sum + dist.studentHeadcount, 0)) * 100;
+        acc[grade] = (totalGradeStudents / cumulativeNumStudents) * 100;
         return acc;
     }, {} as GradePercentages);
 
@@ -51,15 +53,12 @@ export default function ClassFilterSelect({ classData, distributions }: { classD
             cumulative: cumulativeGradePercentages[grade],
         };
         if (selectedInstructor) {
-            data.instructor = gradePercentages[grade];
+            data.instructor = filteredGradePercentages[grade];
         } else if (selectedSemester) {
-            data.semester = gradePercentages[grade];
+            data.semester = filteredGradePercentages[grade];
         }
         return data;
     }).filter(entry => entry.cumulative > 0 || entry.instructor > 0 || entry.semester > 0);
-
-    const percentageA = gradePercentages["A"];
-
 
     return (
         <>
@@ -127,7 +126,15 @@ export default function ClassFilterSelect({ classData, distributions }: { classD
                         selectedSemester={selectedSemester}
                     />
                 </div>
-                <ClassDataCards totalStudents={totalStudents} averageGPA={averageGPA} percentageA={percentageA} />
+                <ClassDataCards
+                    cumulativeNumStudents={cumulativeNumStudents}
+                    cumulativeAverageGPA={cumulativeAverageGPA}
+                    cumulativeGradePercentages={cumulativeGradePercentages}
+                    filteredNumStudents={filteredNumStudents}
+                    filteredAverageGPA={filteredAverageGPA}
+                    filteredGradePercentages={filteredGradePercentages}
+                    isFiltered={selectedInstructor !== null || selectedSemester !== null}
+                />
             </div>
         </>
     );

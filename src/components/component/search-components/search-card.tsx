@@ -12,7 +12,7 @@ export default function SearchCard({ data, type }: { data: any; type: "classes" 
         title = data.name;
         href = `/instructor/${data.id}`;
     } else if (type === "departments") {
-        title = `${data.code} - ${data.name}`;
+        title = data.code;
         href = `/department/${data.code}`;
     }
 
