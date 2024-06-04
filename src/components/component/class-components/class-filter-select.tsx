@@ -73,7 +73,7 @@ export default function ClassFilterSelect({ classData, distributions }: { classD
                         value={selectedInstructor !== null ? selectedInstructor.toString() : undefined}
                         onValueChange={(value) => setSelectedInstructor(value ? Number(value) : null)}
                     >
-                        <SelectTrigger id="instructors" className="w-full bg-[#f6f6ef] border-[#f6f6ef]">
+                        <SelectTrigger id="instructors" className="w-full bg-[#f6f6ef] border-[#f6f6ef] text-black">
                             <SelectValue placeholder="All Instructors" />
                         </SelectTrigger>
                         <SelectContent position="popper" className='bg-[#f6f6ef] border-[#f6f6ef]'>
@@ -95,7 +95,7 @@ export default function ClassFilterSelect({ classData, distributions }: { classD
                         value={selectedSemester !== null ? selectedSemester : undefined}
                         onValueChange={(value) => setSelectedSemester(value)}
                     >
-                        <SelectTrigger id="semesters" className="w-full bg-[#f6f6ef] border-[#f6f6ef]">
+                        <SelectTrigger id="semesters" className="w-full bg-[#f6f6ef] border-[#f6f6ef] text-black">
                             <SelectValue placeholder="All Semesters" />
                         </SelectTrigger>
                         <SelectContent position="popper" className='bg-[#f6f6ef] border-[#f6f6ef]'>

@@ -12,7 +12,7 @@ export default function Home() {
             <h1 className="text-3xl lg:text-6xl font-bold tracking-tight text-center text-black ">
               Find grade distributions for UWL classes
             </h1>
-            <p className="mb-12 mt-7 text-2xl lg:text-3xl opacity-75 text-center">
+            <p className="mb-12 mt-7 text-2xl lg:text-3xl opacity-75 text-center text-black">
               View all the past grades for classes taken at the University of Wisconsin, Lacrosse.
             </p>
             <div className="md:w-[600px] sm:w-11/12">
