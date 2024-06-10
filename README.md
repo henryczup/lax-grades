@@ -1,4 +1,4 @@
-```markdown
+
 # LAXGRADES - Explore UWL Grade Distributions
 
 LAXGRADES is a web application that allows users to explore grade distributions for classes at the University of Wisconsin-La Crosse. With LAXGRADES, you can search and compare historical grade data, GPAs, and pass rates for courses across various semesters and instructors.
@@ -74,4 +74,3 @@ This project is licensed under the [MIT License](LICENSE).
 ## Contact
 
 If you have any questions or inquiries about the LAXGRADES project, please contact [henryczup@gmail.com](mailto:henryczup@gmail.com).
-```
