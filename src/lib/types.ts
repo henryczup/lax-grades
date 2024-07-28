@@ -10,6 +10,13 @@ export interface ClassData {
     };
 }
 
+export interface FormData {
+    firstName: string;
+    lastName: string;
+    email: string;
+    message: string;
+}
+
 export interface GradeDistribution {
     term: string;
     grades: Prisma.JsonValue;
