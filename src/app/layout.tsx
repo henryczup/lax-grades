@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Footer from "@/components/component/shared-components/footer";
 import NavBar from "@/components/component/shared-components/navbar";
+import Script from "next/script";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,6 +21,20 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <Script async src="https://www.googletagmanager.com/gtag/js?id=G-XYGL070WW8"></Script>
+      <Script
+        id="gtm-script"
+        dangerouslySetInnerHTML={{
+          __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            
+            gtag('config', 'G-XYGL070WW8');
+            `
+        }}
+
+      />
       <body className={inter.className}>
         <NavBar />
         {children}
